@@ -34,6 +34,12 @@ Dokumentation:
 - App-Anleitung Deutsch: [docs/manual_de.md](docs/manual_de.md)
 - App-Manual English: [docs/manual_en.md](docs/manual_en.md)
 
+GitHub Actions:
+
+- Der Workflow [`.github/workflows/windows-installer.yml`](.github/workflows/windows-installer.yml) baut auf GitHub automatisch einen Windows-NSIS-Installer.
+- Er läuft manuell über `workflow_dispatch` oder automatisch bei Änderungen an App-, Tauri- oder Workflow-Dateien auf `main`.
+- Das Ergebnis wird als GitHub-Artifact `nightkite-configurator-windows-installer` bereitgestellt.
+
 ## Entwicklung
 
 Frontend bauen:
@@ -96,6 +102,12 @@ Documentation:
 
 - App manual German: [docs/manual_de.md](docs/manual_de.md)
 - App manual English: [docs/manual_en.md](docs/manual_en.md)
+
+GitHub Actions:
+
+- The workflow [`.github/workflows/windows-installer.yml`](.github/workflows/windows-installer.yml) builds a Windows NSIS installer on GitHub.
+- It can be started manually with `workflow_dispatch` or runs automatically for relevant changes on `main`.
+- The result is uploaded as the GitHub artifact `nightkite-configurator-windows-installer`.
 
 ## Development
 
