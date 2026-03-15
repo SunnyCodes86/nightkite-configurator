@@ -11,9 +11,40 @@ export interface ConfigSnapshot {
   enabledPatterns: number[];
 }
 
+export interface PatternState {
+  id: number;
+  name: string;
+  enabled: boolean;
+  active: boolean;
+}
+
 export interface DiagnosticSnapshot {
+  batteryRaw: string;
   batteryVoltage: string;
-  sensorState: string;
-  fps: string;
-  offsets: string;
+  usbPowerRaw: string;
+  serialSessionActive: string;
+  sensorSummary: string;
+  timingSummary: string;
+  offsetsSummary: string;
+  smoothingConfig: number | null;
+  smoothingActive: number | null;
+  accelRangeConfig: number | null;
+  accelRangeActive: number | null;
+  gyroRangeConfig: number | null;
+  gyroRangeActive: number | null;
+}
+
+export interface ConnectionInfo {
+  connected: boolean;
+  portName: string;
+  baudRate: number;
+}
+
+export type AppLanguage = "de" | "en";
+
+export interface CliLine {
+  raw: string;
+  kind: "ok" | "err" | "info" | "other";
+  values: Record<string, string>;
+  message: string;
 }

@@ -2,34 +2,45 @@
 
 Desktop configuration tool for the NightKite Multi firmware.
 
-Current scaffold:
+Current status:
 - `Tauri + React + TypeScript`
-- basic desktop UI layout
-- feature folders for connection, config, patterns, diagnostics and calibration
-- Tauri shell ready for later serial/CLI integration
+- native serial bridge in the Tauri backend using `serialport`
+- parses the existing NightKite CLI replies (`OK`, `ERR`, `INFO`)
+- live panels for connection, configuration, patterns, diagnostics and calibration
+- supports reading and changing the current firmware settings over USB serial
 
-Planned next steps:
-1. Install dependencies with `npm install`
-2. Install Rust / Cargo toolchain
-3. Add serial transport and CLI parsing
-4. Connect UI controls to the NightKite firmware commands
+Implemented device actions:
+- list serial ports
+- connect / disconnect
+- read `show`, `patterns`, `battery`, `sensor`, `timing`, `offsets`
+- apply `set ...` changes for pattern, brightness, strip length, smoothing, accel range, gyro range and boot calibration
+- enable / disable patterns through `enable_pattern` and `disable_pattern`
+- run `save`, `load`, `defaults`, `reboot`
+- run `calibrate quick` and `calibrate precise`
 
 ## Development
 
-Frontend only:
+Frontend build:
 
 ```bash
 npm install
-npm run dev
+npm run build
 ```
 
-Full Tauri app:
+Run the desktop app in development:
 
 ```bash
 npm install
 npm run tauri dev
 ```
 
+Create a debug app bundle:
+
+```bash
+npm run tauri build -- --debug --bundles app
+```
+
 ## Notes
 
-This repository currently contains only the project scaffold. Serial communication and CLI integration are not implemented yet.
+- The app is built against the current NightKite Multi CLI protocol.
+- The full macOS `.dmg` packaging step is not set up yet, but the app binary and `.app` bundle build successfully.
