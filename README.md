@@ -56,11 +56,17 @@ Debug-App-Bundle erstellen:
 npm run tauri build -- --debug --bundles app
 ```
 
+macOS-`dmg` erstellen:
+
+```bash
+npm run build:dmg
+```
+
 ## Hinweise
 
 - Die App ist gegen das aktuelle NightKite-Multi-CLI-Protokoll gebaut.
 - Änderungen an der Firmware-CLI können Anpassungen im Parser oder in der UI erfordern.
-- Der vollständige macOS-`.dmg`-Packaging-Schritt ist noch nicht eingerichtet, aber Binary und `.app`-Bundle bauen erfolgreich.
+- Der macOS-`dmg`-Build ist eingerichtet und wurde erfolgreich verifiziert.
 
 ## English
 
@@ -113,8 +119,14 @@ Create a debug app bundle:
 npm run tauri build -- --debug --bundles app
 ```
 
+Create a macOS `dmg`:
+
+```bash
+npm run build:dmg
+```
+
 ## Notes
 
 - The app is built against the current NightKite Multi CLI protocol.
 - Changes to the firmware CLI may require parser or UI updates in the configurator.
-- Full macOS `.dmg` packaging is not set up yet, but the binary and `.app` bundle build successfully.
+- The macOS `dmg` build is configured and has been verified successfully.
