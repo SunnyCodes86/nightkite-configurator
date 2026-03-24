@@ -40,6 +40,26 @@ function formatLogLine(message: string) {
   return `[${timestamp}] ${message}`;
 }
 
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function isLikelyConnectionLoss(message: string) {
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("timed out waiting for reply") ||
+    normalized.includes("not connected to a serial device") ||
+    normalized.includes("device disconnected") ||
+    normalized.includes("device not configured") ||
+    normalized.includes("broken pipe") ||
+    normalized.includes("input/output error") ||
+    normalized.includes("no such file") ||
+    normalized.includes("cannot find the file") ||
+    normalized.includes("system cannot find the file") ||
+    normalized.includes("access is denied")
+  );
+}
+
 export default function App() {
   const clientRef = useRef(new DeviceClient());
   const [ports, setPorts] = useState<string[]>([]);
@@ -115,6 +135,20 @@ export default function App() {
   }, [autoRefreshEnabled, autoRefreshSeconds, connection.connected, busy]);
 
   useEffect(() => {
+    if (!connection.connected || busy) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      void verifyConnectedPortStillPresent();
+    }, 2000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [connection.connected, connection.portName, busy]);
+
+  useEffect(() => {
     const client = clientRef.current;
     void client.start((line) => {
       setLogLines((current) => [...current.slice(-119), formatLogLine(line.raw)]);
@@ -172,6 +206,19 @@ export default function App() {
     }
   }
 
+  async function verifyConnectedPortStillPresent() {
+    try {
+      const availablePorts = await clientRef.current.listPorts();
+      setPorts(availablePorts);
+
+      if (connection.connected && connection.portName && !availablePorts.includes(connection.portName)) {
+        await handleConnectionLost(`controller on '${connection.portName}' was disconnected`);
+      }
+    } catch (error) {
+      appendError(error);
+    }
+  }
+
   async function syncConnectionStatus() {
     try {
       const status = await clientRef.current.getConnectionStatus();
@@ -185,8 +232,41 @@ export default function App() {
   }
 
   function appendError(error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
+    const message = getErrorMessage(error);
     setLogLines((current) => [...current.slice(-119), formatLogLine(`ERR ${message}`)]);
+  }
+
+  async function handleConnectionLost(reason: string) {
+    if (!connection.connected) {
+      return;
+    }
+
+    try {
+      await clientRef.current.disconnect();
+    } catch {
+      // Ignore cleanup failures if the device is already gone.
+    }
+
+    setConnection(INITIAL_CONNECTION);
+    setDiagnostics(DEFAULT_DIAGNOSTICS);
+    setBootCalibrationPendingReboot(false);
+    setLogLines((current) => [
+      ...current.slice(-119),
+      formatLogLine(`INFO Connection lost: ${reason}`),
+    ]);
+
+    try {
+      const availablePorts = await clientRef.current.listPorts();
+      setPorts(availablePorts);
+      setSelectedPort((current) => {
+        if (current && availablePorts.includes(current)) {
+          return current;
+        }
+        return availablePorts[0] ?? "";
+      });
+    } catch {
+      // Ignore follow-up refresh errors.
+    }
   }
 
   function updateConfigDraft<K extends keyof ConfigSnapshot>(key: K, value: ConfigSnapshot[K]) {
@@ -282,6 +362,10 @@ export default function App() {
       await work();
     } catch (error) {
       appendError(error);
+      const message = getErrorMessage(error);
+      if (connection.connected && isLikelyConnectionLoss(message)) {
+        await handleConnectionLost(message);
+      }
     } finally {
       setBusy(false);
     }
