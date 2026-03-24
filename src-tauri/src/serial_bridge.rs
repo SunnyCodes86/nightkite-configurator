@@ -58,10 +58,15 @@ pub fn open_connection(
     baud_rate: Option<u32>,
 ) -> Result<SerialConnection, String> {
     let baud_rate = baud_rate.unwrap_or(DEFAULT_BAUD_RATE);
-    let port = serialport::new(port_name, baud_rate)
+    let mut port = serialport::new(port_name, baud_rate)
         .timeout(Duration::from_millis(100))
         .open()
         .map_err(|error| error.to_string())?;
+
+    // The firmware only enters CLI mode while DTR is asserted.
+    port.write_data_terminal_ready(true)
+        .map_err(|error| error.to_string())?;
+    let _ = port.write_request_to_send(true);
 
     Ok(SerialConnection {
         port_name: port_name.to_string(),
