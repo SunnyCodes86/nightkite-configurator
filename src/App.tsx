@@ -258,6 +258,24 @@ export default function App() {
     await readOffsets();
   }
 
+  async function readAllWithRetries(attempts: number, retryDelayMs: number) {
+    let lastError: unknown = null;
+
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
+      try {
+        await readAll();
+        return;
+      } catch (error) {
+        lastError = error;
+        if (attempt < attempts - 1) {
+          await delay(retryDelayMs);
+        }
+      }
+    }
+
+    throw lastError;
+  }
+
   async function withBusy(work: () => Promise<void>) {
     setBusy(true);
     try {
@@ -273,8 +291,8 @@ export default function App() {
     await withBusy(async () => {
       const status = await clientRef.current.connect(selectedPort);
       setConnection(status);
-      await delay(1200);
-      await readAll();
+      await delay(1800);
+      await readAllWithRetries(4, 900);
       setBootCalibrationPendingReboot(false);
     });
   }

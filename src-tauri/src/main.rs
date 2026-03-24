@@ -4,8 +4,11 @@ use nightkite_configurator::serial_bridge::{
     list_serial_ports as list_serial_ports_internal, open_connection, run_command_internal,
     CommandReply, ConnectionStatus, SerialConnection, SerialPortInfo, DEFAULT_BAUD_RATE,
 };
-use std::{fs, path::PathBuf, sync::Mutex};
+use std::sync::Mutex;
 use tauri::State;
+
+const MANUAL_DE: &str = include_str!("../../docs/manual_de.md");
+const MANUAL_EN: &str = include_str!("../../docs/manual_en.md");
 
 #[derive(Default)]
 struct SerialState {
@@ -107,21 +110,13 @@ fn run_cli_command(
 
 #[tauri::command]
 fn get_manual_content(language: String) -> Result<String, String> {
-    let file_name = match language.as_str() {
-        "de" => "manual_de.md",
-        "en" => "manual_en.md",
+    let content = match language.as_str() {
+        "de" => MANUAL_DE,
+        "en" => MANUAL_EN,
         _ => return Err("unsupported manual language".to_string()),
     };
 
-    let manual_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("..")
-        .join("..")
-        .join("nightkite-multi")
-        .join("manual")
-        .join(file_name);
-
-    fs::read_to_string(&manual_path)
-        .map_err(|error| format!("failed to read manual '{}': {}", manual_path.display(), error))
+    Ok(content.to_string())
 }
 
 fn main() {
