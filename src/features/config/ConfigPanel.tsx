@@ -86,7 +86,7 @@ export function ConfigPanel(props: ConfigPanelProps) {
           <input
             type="number"
             min={1}
-            max={13}
+            max={14}
             value={config.pattern}
             onChange={(event) => onChange("pattern", Number.parseInt(event.target.value || "1", 10))}
             disabled={!connected || busy}
