@@ -9,6 +9,7 @@ export interface ConfigSnapshot {
   gyroRange: number;
   bootCalibration: BootCalibrationMode;
   enabledPatterns: number[];
+  invertedPatterns: number[];
 }
 
 export interface PatternState {
@@ -16,6 +17,7 @@ export interface PatternState {
   name: string;
   enabled: boolean;
   active: boolean;
+  inverted: boolean;
 }
 
 export interface DiagnosticSnapshot {

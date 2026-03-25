@@ -20,6 +20,7 @@ export const DEFAULT_CONFIG: ConfigSnapshot = {
   gyroRange: 2000,
   bootCalibration: "quick",
   enabledPatterns: Array.from({ length: LAST_PATTERN_ID }, (_, index) => index + 1),
+  invertedPatterns: [],
 };
 
 export const DEFAULT_DIAGNOSTICS: DiagnosticSnapshot = {
@@ -98,6 +99,7 @@ export function configFromCliLine(line: CliLine, currentConfig: ConfigSnapshot):
       parsePatternIdList(line.values.enabled_patterns).length > 0
         ? parsePatternIdList(line.values.enabled_patterns)
         : currentConfig.enabledPatterns,
+    invertedPatterns: parsePatternIdList(line.values.inverted_patterns),
   };
 }
 
@@ -105,10 +107,11 @@ export function patternStatesFromCliLine(
   line: CliLine,
   activePattern: number,
   enabledPatterns: number[],
+  invertedPatterns: number[],
 ): PatternState[] {
   const payload = line.values.patterns ?? "";
   if (!payload) {
-    return createFallbackPatternStates(activePattern, enabledPatterns);
+    return createFallbackPatternStates(activePattern, enabledPatterns, invertedPatterns);
   }
 
   return payload.split(",").map((item) => {
@@ -119,6 +122,7 @@ export function patternStatesFromCliLine(
       name: nameText || `Pattern ${id}`,
       enabled: stateText === "on",
       active: id === activePattern,
+      inverted: invertedPatterns.includes(id),
     };
   });
 }
@@ -126,6 +130,7 @@ export function patternStatesFromCliLine(
 export function createFallbackPatternStates(
   activePattern: number,
   enabledPatterns: number[],
+  invertedPatterns: number[],
 ): PatternState[] {
   return Array.from({ length: LAST_PATTERN_ID }, (_, index) => {
     const id = index + 1;
@@ -134,6 +139,7 @@ export function createFallbackPatternStates(
       name: `Pattern ${id}`,
       enabled: enabledPatterns.includes(id),
       active: id === activePattern,
+      inverted: invertedPatterns.includes(id),
     };
   });
 }

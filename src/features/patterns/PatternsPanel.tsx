@@ -11,26 +11,33 @@ interface PatternsPanelProps {
     enabled: string;
     disabled: string;
     active: string;
+    inverted: string;
     includeInCycle: string;
+    invertDirection: string;
     makeActive: string;
     enableAll: string;
+    invertAll: string;
     readPatternList: string;
     applySelection: string;
     includeInCycleHint: string;
+    invertDirectionHint: string;
     makeActiveHint: string;
     enableAllHint: string;
+    invertAllHint: string;
     readPatternListHint: string;
     applySelectionHint: string;
   };
   onToggleEnabled: (patternId: number) => void;
+  onToggleInverted: (patternId: number) => void;
   onSetActive: (patternId: number) => void;
   onRefresh: () => void;
   onApply: () => void;
   onEnableAll: () => void;
+  onInvertAll: () => void;
 }
 
 export function PatternsPanel(props: PatternsPanelProps) {
-  const { patterns, connected, busy, helpTooltip, labels, onToggleEnabled, onSetActive, onRefresh, onApply, onEnableAll } = props;
+  const { patterns, connected, busy, helpTooltip, labels, onToggleEnabled, onToggleInverted, onSetActive, onRefresh, onApply, onEnableAll, onInvertAll } = props;
 
   return (
     <section className="panel panel-patterns">
@@ -58,6 +65,7 @@ export function PatternsPanel(props: PatternsPanelProps) {
                     {pattern.enabled ? labels.enabled : labels.disabled}
                   </span>
                   {pattern.active ? <span className="pattern-badge is-active">{labels.active}</span> : null}
+                  {pattern.inverted ? <span className="pattern-badge is-active">{labels.inverted}</span> : null}
                 </div>
               </div>
               <div className="pattern-name">{pattern.name}</div>
@@ -71,6 +79,16 @@ export function PatternsPanel(props: PatternsPanelProps) {
                 title={labels.includeInCycleHint}
               />
               <span>{labels.includeInCycle}</span>
+            </label>
+            <label className="pattern-toggle">
+              <input
+                type="checkbox"
+                checked={pattern.inverted}
+                onChange={() => onToggleInverted(pattern.id)}
+                disabled={!connected || busy}
+                title={labels.invertDirectionHint}
+              />
+              <span>{labels.invertDirection}</span>
             </label>
             <button
               type="button"
@@ -88,6 +106,9 @@ export function PatternsPanel(props: PatternsPanelProps) {
       <div className="button-row">
         <button type="button" onClick={onEnableAll} disabled={!connected || busy} title={labels.enableAllHint}>
           {labels.enableAll}
+        </button>
+        <button type="button" onClick={onInvertAll} disabled={!connected || busy} title={labels.invertAllHint}>
+          {labels.invertAll}
         </button>
         <button type="button" onClick={onRefresh} disabled={!connected || busy} title={labels.readPatternListHint}>
           {labels.readPatternList}

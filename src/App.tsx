@@ -68,7 +68,11 @@ export default function App() {
   const [config, setConfig] = useState<ConfigSnapshot>(DEFAULT_CONFIG);
   const [draftConfig, setDraftConfig] = useState<ConfigSnapshot>(DEFAULT_CONFIG);
   const [patterns, setPatterns] = useState<PatternState[]>(
-    createFallbackPatternStates(DEFAULT_CONFIG.pattern, DEFAULT_CONFIG.enabledPatterns),
+    createFallbackPatternStates(
+      DEFAULT_CONFIG.pattern,
+      DEFAULT_CONFIG.enabledPatterns,
+      DEFAULT_CONFIG.invertedPatterns,
+    ),
   );
   const [diagnostics, setDiagnostics] = useState<DiagnosticSnapshot>(DEFAULT_DIAGNOSTICS);
   const [logLines, setLogLines] = useState<string[]>([
@@ -287,12 +291,17 @@ export default function App() {
     setDraftConfig(nextConfig);
     setPatterns((current) => {
       if (current.length === 0) {
-        return createFallbackPatternStates(nextConfig.pattern, nextConfig.enabledPatterns);
+        return createFallbackPatternStates(
+          nextConfig.pattern,
+          nextConfig.enabledPatterns,
+          nextConfig.invertedPatterns,
+        );
       }
       return current.map((pattern) => ({
         ...pattern,
         enabled: nextConfig.enabledPatterns.includes(pattern.id),
         active: pattern.id === nextConfig.pattern,
+        inverted: nextConfig.invertedPatterns.includes(pattern.id),
       }));
     });
   }
@@ -306,7 +315,14 @@ export default function App() {
 
   async function readPatterns(nextConfig = config) {
     const line = await clientRef.current.runSimpleCommand("patterns");
-    setPatterns(patternStatesFromCliLine(line, nextConfig.pattern, nextConfig.enabledPatterns));
+    setPatterns(
+      patternStatesFromCliLine(
+        line,
+        nextConfig.pattern,
+        nextConfig.enabledPatterns,
+        nextConfig.invertedPatterns,
+      ),
+    );
   }
 
   async function readBattery() {
@@ -478,6 +494,14 @@ export default function App() {
     );
   }
 
+  function handleToggleInvertedPattern(patternId: number) {
+    setPatterns((current) =>
+      current.map((pattern) =>
+        pattern.id === patternId ? { ...pattern, inverted: !pattern.inverted } : pattern,
+      ),
+    );
+  }
+
   async function handleApplyPatterns() {
     await withBusy(async () => {
       const desiredEnabled = patterns.filter((pattern) => pattern.enabled).map((pattern) => pattern.id);
@@ -487,15 +511,26 @@ export default function App() {
 
       const currentlyEnabled = new Set(config.enabledPatterns);
       const desiredEnabledSet = new Set(desiredEnabled);
+      const desiredInverted = patterns.filter((pattern) => pattern.inverted).map((pattern) => pattern.id);
+      const currentlyInverted = new Set(config.invertedPatterns);
+      const desiredInvertedSet = new Set(desiredInverted);
 
       const toEnable = desiredEnabled.filter((patternId) => !currentlyEnabled.has(patternId));
       const toDisable = config.enabledPatterns.filter((patternId) => !desiredEnabledSet.has(patternId));
+      const toInvert = desiredInverted.filter((patternId) => !currentlyInverted.has(patternId));
+      const toNormalize = config.invertedPatterns.filter((patternId) => !desiredInvertedSet.has(patternId));
 
       if (toEnable.length > 0) {
         await clientRef.current.runSimpleCommand(`enable_pattern ${toEnable.join(",")}`);
       }
       if (toDisable.length > 0) {
         await clientRef.current.runSimpleCommand(`disable_pattern ${toDisable.join(",")}`);
+      }
+      if (toInvert.length > 0) {
+        await clientRef.current.runSimpleCommand(`invert_pattern ${toInvert.join(",")}`);
+      }
+      if (toNormalize.length > 0) {
+        await clientRef.current.runSimpleCommand(`normal_pattern ${toNormalize.join(",")}`);
       }
       if (draftConfig.pattern !== config.pattern) {
         await clientRef.current.runSimpleCommand(`set pattern ${draftConfig.pattern}`);
@@ -506,6 +541,10 @@ export default function App() {
 
   function handleEnableAllPatterns() {
     setPatterns((current) => current.map((pattern) => ({ ...pattern, enabled: true })));
+  }
+
+  function handleInvertAllPatterns() {
+    setPatterns((current) => current.map((pattern) => ({ ...pattern, inverted: true })));
   }
 
   async function handleActivatePattern(patternId: number) {
@@ -668,7 +707,12 @@ export default function App() {
           await readAll();
         }
       }
-      if (command.startsWith("enable_pattern ") || command.startsWith("disable_pattern ")) {
+      if (
+        command.startsWith("enable_pattern ") ||
+        command.startsWith("disable_pattern ") ||
+        command.startsWith("invert_pattern ") ||
+        command.startsWith("normal_pattern ")
+      ) {
         await readAll();
       }
     });
@@ -758,6 +802,7 @@ export default function App() {
           helpTooltip={text.patterns.sectionHelp}
           labels={text.patterns}
           onToggleEnabled={handleTogglePattern}
+          onToggleInverted={handleToggleInvertedPattern}
           onSetActive={(patternId) => {
             void handleActivatePattern(patternId);
           }}
@@ -770,6 +815,7 @@ export default function App() {
             void handleApplyPatterns();
           }}
           onEnableAll={handleEnableAllPatterns}
+          onInvertAll={handleInvertAllPatterns}
         />
         <DiagnosticsPanel
           diagnostics={diagnostics}
@@ -918,18 +964,23 @@ const translations = {
       enabled: "Aktiv",
       disabled: "Aus",
       active: "Live",
+      inverted: "Invertiert",
       includeInCycle: "Im Button-Zyklus",
+      invertDirection: "Richtung invertieren",
       makeActive: "Aktivieren",
       enableAll: "Alle aktivieren",
+      invertAll: "Alle invertieren",
       readPatternList: "Pattern-Liste lesen",
       applySelection: "Auswahl anwenden",
       includeInCycleHint: "Legt fest, ob dieses Pattern per Button-Zyklus auf der Hardware erreichbar ist.",
+      invertDirectionHint: "Kehrt die Laufrichtung dieses Patterns um, sofern das Firmware-Pattern Richtungsumschaltung unterstützt.",
       makeActiveHint: "Schaltet dieses Pattern sofort live auf der Hardware aktiv.",
       enableAllHint: "Markiert alle Patterns als im Button-Zyklus verfügbar.",
+      invertAllHint: "Markiert alle Patterns als invertiert. Die Änderung wird erst mit 'Auswahl anwenden' auf die Hardware übertragen.",
       readPatternListHint: "Liest den aktuellen Pattern-Status erneut vom Controller.",
       applySelectionHint: "Überträgt die aktuelle Pattern-Auswahl auf die Hardware.",
       sectionHelp:
-        "Pattern-Verwaltung. Jede Zeile zeigt ein Firmware-Pattern mit ID, Namen, Aktiv-Status und Auswahl für den Button-Zyklus. Du kannst einzelne Patterns in den Zyklus aufnehmen oder entfernen, ein Pattern sofort live aktivieren, alle aktivieren, die aktuelle Liste neu lesen oder die Auswahl gesammelt anwenden.",
+        "Pattern-Verwaltung. Jede Zeile zeigt ein Firmware-Pattern mit ID, Namen, Aktiv-Status, Button-Zyklus-Auswahl und optional invertierter Laufrichtung. Du kannst einzelne Patterns in den Zyklus aufnehmen oder entfernen, die Richtung umkehren, ein Pattern sofort live aktivieren, alle aktivieren, die aktuelle Liste neu lesen oder die Auswahl gesammelt anwenden.",
     },
     diagnostics: {
       title: "Diagnose",
@@ -1070,18 +1121,23 @@ const translations = {
       enabled: "Enabled",
       disabled: "Disabled",
       active: "Active",
+      inverted: "Inverted",
       includeInCycle: "Include in button cycle",
+      invertDirection: "Invert direction",
       makeActive: "Make Active",
       enableAll: "Enable All",
+      invertAll: "Invert All",
       readPatternList: "Read Pattern List",
       applySelection: "Apply Selection",
       includeInCycleHint: "Controls whether this pattern is reachable through hardware button cycling.",
+      invertDirectionHint: "Reverses this pattern's animation direction if the firmware pattern supports direction switching.",
       makeActiveHint: "Makes this pattern live on the hardware immediately.",
       enableAllHint: "Marks all patterns as available in the button cycle.",
+      invertAllHint: "Marks all patterns as inverted. The change is only sent to the hardware after 'Apply Selection'.",
       readPatternListHint: "Reads the current pattern state again from the controller.",
       applySelectionHint: "Transfers the current pattern selection to the hardware.",
       sectionHelp:
-        "Pattern management. Each row shows one firmware pattern with its ID, name, active state, and button-cycle inclusion. You can include or exclude patterns from the hardware button cycle, make one pattern live immediately, enable all, reread the list, or apply the current selection in one step.",
+        "Pattern management. Each row shows one firmware pattern with its ID, name, active state, button-cycle inclusion, and optional inverted direction. You can include or exclude patterns from the hardware button cycle, reverse their direction, make one pattern live immediately, enable all, reread the list, or apply the current selection in one step.",
     },
     diagnostics: {
       title: "Diagnostics",
