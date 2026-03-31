@@ -156,6 +156,29 @@ export default function App() {
     const client = clientRef.current;
     void client.start((line) => {
       setLogLines((current) => [...current.slice(-119), formatLogLine(line.raw)]);
+
+      if (line.values.pattern || line.values.autoplay || line.values.autoplay_interval) {
+        setConfig((current) => {
+          const nextConfig = configFromCliLine(line, current);
+          setDraftConfig(nextConfig);
+          setPatterns((existing) => {
+            if (existing.length === 0) {
+              return createFallbackPatternStates(
+                nextConfig.pattern,
+                nextConfig.enabledPatterns,
+                nextConfig.invertedPatterns,
+              );
+            }
+            return existing.map((pattern) => ({
+              ...pattern,
+              enabled: nextConfig.enabledPatterns.includes(pattern.id),
+              active: pattern.id === nextConfig.pattern,
+              inverted: nextConfig.invertedPatterns.includes(pattern.id),
+            }));
+          });
+          return nextConfig;
+        });
+      }
     });
 
     void refreshPorts();
@@ -427,6 +450,14 @@ export default function App() {
         await clientRef.current.runSimpleCommand(`set boot_calibration ${draftConfig.bootCalibration}`);
         setBootCalibrationPendingReboot(true);
       }
+      if (draftConfig.autoplayEnabled !== config.autoplayEnabled) {
+        await clientRef.current.runSimpleCommand(`set autoplay ${draftConfig.autoplayEnabled ? "on" : "off"}`);
+      }
+      if (draftConfig.autoplayIntervalSeconds !== config.autoplayIntervalSeconds) {
+        await clientRef.current.runSimpleCommand(
+          `set autoplay_interval ${draftConfig.autoplayIntervalSeconds}`,
+        );
+      }
       await readAll();
     });
   }
@@ -505,10 +536,6 @@ export default function App() {
   async function handleApplyPatterns() {
     await withBusy(async () => {
       const desiredEnabled = patterns.filter((pattern) => pattern.enabled).map((pattern) => pattern.id);
-      if (desiredEnabled.length === 0) {
-        throw new Error("At least one pattern must remain enabled");
-      }
-
       const currentlyEnabled = new Set(config.enabledPatterns);
       const desiredEnabledSet = new Set(desiredEnabled);
       const desiredInverted = patterns.filter((pattern) => pattern.inverted).map((pattern) => pattern.id);
@@ -540,11 +567,20 @@ export default function App() {
   }
 
   function handleEnableAllPatterns() {
-    setPatterns((current) => current.map((pattern) => ({ ...pattern, enabled: true })));
+    setPatterns((current) => {
+      const allEnabled = current.every((pattern) => pattern.enabled);
+      if (allEnabled) {
+        return current.map((pattern) => ({ ...pattern, enabled: pattern.id === 1 }));
+      }
+      return current.map((pattern) => ({ ...pattern, enabled: true }));
+    });
   }
 
   function handleInvertAllPatterns() {
-    setPatterns((current) => current.map((pattern) => ({ ...pattern, inverted: true })));
+    setPatterns((current) => {
+      const allInverted = current.every((pattern) => pattern.inverted);
+      return current.map((pattern) => ({ ...pattern, inverted: !allInverted }));
+    });
   }
 
   async function handleActivatePattern(patternId: number) {
@@ -613,7 +649,9 @@ export default function App() {
         key === "smoothing" ||
         key === "accel_range" ||
         key === "gyro_range" ||
-        key === "boot_calibration"
+        key === "boot_calibration" ||
+        key === "autoplay" ||
+        key === "autoplay_interval"
       ) {
         const nextConfig = configFromCliLine(line, config);
         mergeConfig(nextConfig);
@@ -921,6 +959,8 @@ const translations = {
       accelRange: "Accel-Range",
       gyroRange: "Gyro-Range",
       bootCalibration: "Boot-Kalibrierung",
+      autoplay: "Autoplay",
+      autoplayInterval: "Autoplay-Intervall (s)",
       readDevice: "Controller lesen",
       applyChanges: "Änderungen anwenden",
       saveToDevice: "Auf Controller speichern",
@@ -933,13 +973,15 @@ const translations = {
       accelRangeHint: "Wählt den Beschleunigungsbereich des Sensors. Greift erst nach Neustart vollständig.",
       gyroRangeHint: "Wählt den Gyrobereich des Sensors. Greift erst nach Neustart vollständig.",
       bootCalibrationHint: "Legt fest, ob beim Start automatisch kalibriert wird.",
+      autoplayHint: "Schaltet das automatische Durchschalten durch die aktiven Pattern global ein oder aus.",
+      autoplayIntervalHint: "Legt fest, nach wie vielen Sekunden Autoplay zum nächsten aktiven Pattern wechselt. Bereich: 1 bis 300 Sekunden.",
       readDeviceHint: "Liest die aktuelle Konfiguration und alle Diagnosewerte erneut vom Controller.",
       applyChangesHint: "Schreibt die geänderten Konfigurationswerte direkt in die laufende Firmware.",
       saveToDeviceHint: "Speichert die aktuelle Konfiguration dauerhaft im Flash des Controllers.",
       loadSavedHint: "Lädt die zuletzt gespeicherte Konfiguration aus dem Controller.",
       defaultsHint: "Setzt die Firmware auf ihre Standardwerte zurück.",
       sectionHelp:
-        "Laufende Firmware-Konfiguration. Active Pattern und Helligkeit beeinflussen die Hardware direkt, während Strip-Länge, Smoothing, Sensorbereiche und Boot-Kalibrierung die Gerätekonfiguration steuern. Mit Controller lesen, Änderungen anwenden, Speichern, Laden und Standardwerte steuerst du das Übernehmen und Sichern der Werte.",
+        "Laufende Firmware-Konfiguration. Active Pattern und Helligkeit beeinflussen die Hardware direkt, während Strip-Länge, Smoothing, Sensorbereiche, Boot-Kalibrierung und Autoplay das Geräteverhalten steuern. Mit Controller lesen, Änderungen anwenden, Speichern, Laden und Standardwerte steuerst du das Übernehmen und Sichern der Werte.",
     },
     options: {
       title: "Optionen",
@@ -1078,6 +1120,8 @@ const translations = {
       accelRange: "Accel Range",
       gyroRange: "Gyro Range",
       bootCalibration: "Boot Calibration",
+      autoplay: "Autoplay",
+      autoplayInterval: "Autoplay Interval (s)",
       readDevice: "Read Device",
       applyChanges: "Apply Changes",
       saveToDevice: "Save to Device",
@@ -1090,13 +1134,15 @@ const translations = {
       accelRangeHint: "Selects the accelerometer range. Fully applies after reboot.",
       gyroRangeHint: "Selects the gyroscope range. Fully applies after reboot.",
       bootCalibrationHint: "Controls whether calibration runs automatically at boot.",
+      autoplayHint: "Globally enables or disables automatic cycling through active patterns.",
+      autoplayIntervalHint: "Defines after how many seconds autoplay advances to the next active pattern. Range: 1 to 300 seconds.",
       readDeviceHint: "Reads configuration and diagnostics again from the controller.",
       applyChangesHint: "Writes the changed configuration values into the running firmware.",
       saveToDeviceHint: "Stores the current configuration persistently in controller flash.",
       loadSavedHint: "Loads the last saved configuration from the controller.",
       defaultsHint: "Resets firmware settings back to their defaults.",
       sectionHelp:
-        "Running firmware configuration. Active Pattern and Brightness affect the hardware immediately, while Strip Length, Smoothing, sensor ranges, and Boot Calibration control device behavior. Read Device, Apply Changes, Save, Load, and Defaults handle refreshing, applying, and storing those values.",
+        "Running firmware configuration. Active Pattern and Brightness affect the hardware immediately, while Strip Length, Smoothing, sensor ranges, Boot Calibration, and Autoplay control device behavior. Read Device, Apply Changes, Save, Load, and Defaults handle refreshing, applying, and storing those values.",
     },
     options: {
       title: "Options",

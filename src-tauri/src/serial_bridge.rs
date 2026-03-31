@@ -31,6 +31,11 @@ pub struct CommandReply {
     pub lines: Vec<String>,
 }
 
+#[derive(Serialize)]
+pub struct LineReply {
+    pub lines: Vec<String>,
+}
+
 fn port_type_label(port_type: &SerialPortType) -> &'static str {
     match port_type {
         SerialPortType::UsbPort(_) => "usb",
@@ -193,4 +198,57 @@ pub fn run_command_internal(
     }
 
     Err(format!("Timed out waiting for reply to '{}'", command))
+}
+
+pub fn poll_lines_internal(
+    port: &mut dyn SerialPort,
+    idle_timeout_ms: u64,
+) -> Result<LineReply, String> {
+    let deadline = Instant::now() + Duration::from_millis(idle_timeout_ms.max(20));
+    let mut chunk = [0_u8; 256];
+    let mut pending = Vec::<u8>::new();
+    let mut lines = Vec::<String>::new();
+    let mut last_received_at: Option<Instant> = None;
+
+    while Instant::now() < deadline {
+        match port.read(&mut chunk) {
+            Ok(bytes_read) if bytes_read > 0 => {
+                pending.extend_from_slice(&chunk[..bytes_read]);
+                last_received_at = Some(Instant::now());
+
+                while let Some(newline_index) = pending.iter().position(|byte| *byte == b'\n') {
+                    let line_bytes: Vec<u8> = pending.drain(..=newline_index).collect();
+                    let line = String::from_utf8_lossy(&line_bytes)
+                        .replace('\r', "")
+                        .trim()
+                        .to_string();
+
+                    if line.is_empty() {
+                        continue;
+                    }
+
+                    let normalized = normalize_cli_prefix(&line);
+                    if normalized.is_empty() {
+                        continue;
+                    }
+
+                    lines.push(normalized);
+                }
+            }
+            Ok(_) => {}
+            Err(error) if error.kind() == std::io::ErrorKind::TimedOut => {
+                if !lines.is_empty()
+                    && last_received_at
+                        .map(|instant| instant.elapsed() >= Duration::from_millis(120))
+                        .unwrap_or(false)
+                {
+                    return Ok(LineReply { lines });
+                }
+                thread::sleep(Duration::from_millis(20));
+            }
+            Err(error) => return Err(error.to_string()),
+        }
+    }
+
+    Ok(LineReply { lines })
 }

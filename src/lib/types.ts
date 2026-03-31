@@ -8,6 +8,8 @@ export interface ConfigSnapshot {
   accelRange: number;
   gyroRange: number;
   bootCalibration: BootCalibrationMode;
+  autoplayEnabled: boolean;
+  autoplayIntervalSeconds: number;
   enabledPatterns: number[];
   invertedPatterns: number[];
 }

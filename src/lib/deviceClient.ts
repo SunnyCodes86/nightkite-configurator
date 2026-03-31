@@ -14,13 +14,25 @@ function inTauriRuntime(): boolean {
 export class DeviceClient {
   private queue: Promise<unknown> = Promise.resolve();
   private lineHandler: ((line: CliLine) => void) | null = null;
+  private pollTimer: number | null = null;
 
   async start(lineHandler: (line: CliLine) => void) {
     this.lineHandler = lineHandler;
+    if (!inTauriRuntime() || this.pollTimer !== null) {
+      return;
+    }
+
+    this.pollTimer = window.setInterval(() => {
+      void this.pollSerialLines();
+    }, 350);
   }
 
   async stop() {
     this.lineHandler = null;
+    if (this.pollTimer !== null) {
+      window.clearInterval(this.pollTimer);
+      this.pollTimer = null;
+    }
   }
 
   async listPorts(): Promise<string[]> {
@@ -156,5 +168,30 @@ export class DeviceClient {
       () => undefined,
     );
     return next;
+  }
+
+  private async pollSerialLines() {
+    if (!this.lineHandler || !inTauriRuntime()) {
+      return;
+    }
+
+    try {
+      const lines = await this.enqueue(async () => {
+        const reply = await invoke<{ lines: string[] }>("poll_serial_lines", {
+          idleTimeoutMs: 120,
+        });
+        return reply.lines.map((line) => parseCliLine(line));
+      });
+
+      lines.forEach((line) => this.lineHandler?.(line));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (
+        message.includes("not connected to a serial device") ||
+        message.includes("Timed out")
+      ) {
+        return;
+      }
+    }
   }
 }

@@ -1,8 +1,9 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use nightkite_configurator::serial_bridge::{
-    list_serial_ports as list_serial_ports_internal, open_connection, run_command_internal,
-    CommandReply, ConnectionStatus, SerialConnection, SerialPortInfo, DEFAULT_BAUD_RATE,
+    list_serial_ports as list_serial_ports_internal, open_connection, poll_lines_internal,
+    run_command_internal, CommandReply, ConnectionStatus, LineReply, SerialConnection,
+    SerialPortInfo, DEFAULT_BAUD_RATE,
 };
 use std::sync::Mutex;
 use tauri::State;
@@ -109,6 +110,22 @@ fn run_cli_command(
 }
 
 #[tauri::command]
+fn poll_serial_lines(
+    state: State<'_, SerialState>,
+    idle_timeout_ms: Option<u64>,
+) -> Result<LineReply, String> {
+    let mut guard = state
+        .connection
+        .lock()
+        .map_err(|_| "serial state lock poisoned".to_string())?;
+    let connection = guard
+        .as_mut()
+        .ok_or_else(|| "not connected to a serial device".to_string())?;
+
+    poll_lines_internal(connection.port.as_mut(), idle_timeout_ms.unwrap_or(120))
+}
+
+#[tauri::command]
 fn get_manual_content(language: String) -> Result<String, String> {
     let content = match language.as_str() {
         "de" => MANUAL_DE,
@@ -128,6 +145,7 @@ fn main() {
             connect_serial,
             disconnect_serial,
             run_cli_command,
+            poll_serial_lines,
             get_manual_content,
         ])
         .run(tauri::generate_context!())

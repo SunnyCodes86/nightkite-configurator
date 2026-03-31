@@ -17,6 +17,8 @@ interface ConfigPanelProps {
     accelRange: string;
     gyroRange: string;
     bootCalibration: string;
+    autoplay: string;
+    autoplayInterval: string;
     readDevice: string;
     applyChanges: string;
     saveToDevice: string;
@@ -29,6 +31,8 @@ interface ConfigPanelProps {
     accelRangeHint: string;
     gyroRangeHint: string;
     bootCalibrationHint: string;
+    autoplayHint: string;
+    autoplayIntervalHint: string;
     readDeviceHint: string;
     applyChangesHint: string;
     saveToDeviceHint: string;
@@ -86,7 +90,7 @@ export function ConfigPanel(props: ConfigPanelProps) {
           <input
             type="number"
             min={1}
-            max={14}
+            max={22}
             value={config.pattern}
             onChange={(event) => onChange("pattern", Number.parseInt(event.target.value || "1", 10))}
             disabled={!connected || busy}
@@ -173,6 +177,31 @@ export function ConfigPanel(props: ConfigPanelProps) {
             <option value="off">off</option>
             <option value="quick">quick</option>
           </select>
+        </label>
+        <label className="field">
+          <span>{labels.autoplay}</span>
+          <select
+            value={config.autoplayEnabled ? "on" : "off"}
+            onChange={(event) => onChange("autoplayEnabled", event.target.value === "on")}
+            disabled={!connected || busy}
+            title={labels.autoplayHint}
+          >
+            <option value="off">off</option>
+            <option value="on">on</option>
+          </select>
+        </label>
+        <label className="field">
+          <span>{labels.autoplayInterval}</span>
+          <input
+            type="number"
+            min={1}
+            max={300}
+            step={1}
+            value={config.autoplayIntervalSeconds}
+            onChange={(event) => onChange("autoplayIntervalSeconds", Number.parseInt(event.target.value || "20", 10))}
+            disabled={!connected || busy}
+            title={labels.autoplayIntervalHint}
+          />
         </label>
       </div>
 

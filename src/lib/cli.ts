@@ -19,6 +19,8 @@ export const DEFAULT_CONFIG: ConfigSnapshot = {
   accelRange: 2,
   gyroRange: 2000,
   bootCalibration: "quick",
+  autoplayEnabled: false,
+  autoplayIntervalSeconds: 20,
   enabledPatterns: Array.from({ length: LAST_PATTERN_ID }, (_, index) => index + 1),
   invertedPatterns: [],
 };
@@ -95,6 +97,8 @@ export function configFromCliLine(line: CliLine, currentConfig: ConfigSnapshot):
     accelRange: parseInteger(line.values.accel_range, currentConfig.accelRange),
     gyroRange: parseInteger(line.values.gyro_range, currentConfig.gyroRange),
     bootCalibration: parseBootCalibration(line.values.boot_calibration),
+    autoplayEnabled: (line.values.autoplay ?? (currentConfig.autoplayEnabled ? "on" : "off")) === "on",
+    autoplayIntervalSeconds: parseInteger(line.values.autoplay_interval, currentConfig.autoplayIntervalSeconds),
     enabledPatterns:
       parsePatternIdList(line.values.enabled_patterns).length > 0
         ? parsePatternIdList(line.values.enabled_patterns)

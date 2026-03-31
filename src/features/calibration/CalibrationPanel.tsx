@@ -122,6 +122,8 @@ export function CalibrationPanel(props: CalibrationPanelProps) {
               <option value="accel_range">accel_range</option>
               <option value="gyro_range">gyro_range</option>
               <option value="boot_calibration">boot_calibration</option>
+              <option value="autoplay">autoplay</option>
+              <option value="autoplay_interval">autoplay_interval</option>
               <option value="enabled_patterns">enabled_patterns</option>
             </select>
             <button type="button" onClick={() => onReadKey(selectedGetKey)} disabled={!connected || busy} title={labels.runGetHint}>
