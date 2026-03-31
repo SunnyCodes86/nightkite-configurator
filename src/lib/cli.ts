@@ -7,7 +7,7 @@ import type {
 } from "./types";
 
 export const FIRST_PATTERN_ID = 1;
-export const LAST_PATTERN_ID = 14;
+export const LAST_PATTERN_ID = 22;
 
 const KEY_VALUE_PATTERN = /([a-z_]+)=("[^"]*"|[^\s]+)/gi;
 
