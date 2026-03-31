@@ -125,6 +125,7 @@ export function CalibrationPanel(props: CalibrationPanelProps) {
               <option value="autoplay">autoplay</option>
               <option value="autoplay_interval">autoplay_interval</option>
               <option value="enabled_patterns">enabled_patterns</option>
+              <option value="inverted_patterns">inverted_patterns</option>
             </select>
             <button type="button" onClick={() => onReadKey(selectedGetKey)} disabled={!connected || busy} title={labels.runGetHint}>
               {labels.runGet}

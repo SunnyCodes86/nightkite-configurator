@@ -89,6 +89,9 @@ function parseBootCalibration(value: string | undefined): BootCalibrationMode {
 }
 
 export function configFromCliLine(line: CliLine, currentConfig: ConfigSnapshot): ConfigSnapshot {
+  const hasEnabledPatterns = Object.prototype.hasOwnProperty.call(line.values, "enabled_patterns");
+  const hasInvertedPatterns = Object.prototype.hasOwnProperty.call(line.values, "inverted_patterns");
+
   return {
     pattern: parseInteger(line.values.pattern, currentConfig.pattern),
     brightness: parseInteger(line.values.brightness, currentConfig.brightness),
@@ -99,11 +102,12 @@ export function configFromCliLine(line: CliLine, currentConfig: ConfigSnapshot):
     bootCalibration: parseBootCalibration(line.values.boot_calibration),
     autoplayEnabled: (line.values.autoplay ?? (currentConfig.autoplayEnabled ? "on" : "off")) === "on",
     autoplayIntervalSeconds: parseInteger(line.values.autoplay_interval, currentConfig.autoplayIntervalSeconds),
-    enabledPatterns:
-      parsePatternIdList(line.values.enabled_patterns).length > 0
-        ? parsePatternIdList(line.values.enabled_patterns)
-        : currentConfig.enabledPatterns,
-    invertedPatterns: parsePatternIdList(line.values.inverted_patterns),
+    enabledPatterns: hasEnabledPatterns
+      ? parsePatternIdList(line.values.enabled_patterns)
+      : currentConfig.enabledPatterns,
+    invertedPatterns: hasInvertedPatterns
+      ? parsePatternIdList(line.values.inverted_patterns)
+      : currentConfig.invertedPatterns,
   };
 }
 

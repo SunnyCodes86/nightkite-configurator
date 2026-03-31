@@ -160,7 +160,14 @@ export default function App() {
       if (line.values.pattern || line.values.autoplay || line.values.autoplay_interval) {
         setConfig((current) => {
           const nextConfig = configFromCliLine(line, current);
-          setDraftConfig(nextConfig);
+          setDraftConfig((draft) => ({
+            ...draft,
+            ...(line.values.pattern ? { pattern: nextConfig.pattern } : {}),
+            ...(line.values.autoplay ? { autoplayEnabled: nextConfig.autoplayEnabled } : {}),
+            ...(line.values.autoplay_interval
+              ? { autoplayIntervalSeconds: nextConfig.autoplayIntervalSeconds }
+              : {}),
+          }));
           setPatterns((existing) => {
             if (existing.length === 0) {
               return createFallbackPatternStates(
@@ -643,6 +650,7 @@ export default function App() {
       const line = await clientRef.current.runSimpleCommand(`get ${key}`);
       if (
         key === "enabled_patterns" ||
+        key === "inverted_patterns" ||
         key === "pattern" ||
         key === "brightness" ||
         key === "strip_length" ||
