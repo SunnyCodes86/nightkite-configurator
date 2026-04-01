@@ -27,6 +27,16 @@ const INITIAL_CONNECTION: ConnectionInfo = {
   baudRate: 115200,
 };
 
+const PATTERN_VIEW_MODE_KEY = "nightkite.patternViewMode";
+
+function readPatternViewMode(): "comfortable" | "compact" {
+  if (typeof window === "undefined") {
+    return "compact";
+  }
+  const stored = window.localStorage.getItem(PATTERN_VIEW_MODE_KEY);
+  return stored === "comfortable" ? "comfortable" : "compact";
+}
+
 function delay(ms: number) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
@@ -84,6 +94,7 @@ export default function App() {
   const [selectedGetKey, setSelectedGetKey] = useState("pattern");
   const [commandDraft, setCommandDraft] = useState("help");
   const [language, setLanguage] = useState<AppLanguage>("de");
+  const [patternViewMode, setPatternViewMode] = useState<"comfortable" | "compact">(readPatternViewMode);
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(false);
   const [autoRefreshSeconds, setAutoRefreshSeconds] = useState(10);
   const [manualContent, setManualContent] = useState("");
@@ -224,6 +235,13 @@ export default function App() {
       cancelled = true;
     };
   }, [language]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    window.localStorage.setItem(PATTERN_VIEW_MODE_KEY, patternViewMode);
+  }, [patternViewMode]);
 
   async function refreshPorts() {
     try {
@@ -828,10 +846,12 @@ export default function App() {
           connected={connection.connected}
           busy={busy}
           language={language}
+          patternViewMode={patternViewMode}
           autoRefreshEnabled={autoRefreshEnabled}
           autoRefreshSeconds={autoRefreshSeconds}
           helpTooltip={text.options.sectionHelp}
           onLanguageChange={setLanguage}
+          onPatternViewModeChange={setPatternViewMode}
           onAutoRefreshEnabledChange={setAutoRefreshEnabled}
           onAutoRefreshSecondsChange={(seconds) => {
             setAutoRefreshSeconds(Number.isFinite(seconds) ? Math.max(2, Math.min(300, seconds)) : 10);
@@ -843,6 +863,7 @@ export default function App() {
             ...pattern,
             active: pattern.id === activePatternId,
           }))}
+          viewMode={patternViewMode}
           connected={connection.connected}
           busy={busy}
           helpTooltip={text.patterns.sectionHelp}
@@ -995,18 +1016,22 @@ const translations = {
       title: "Optionen",
       subtitle: "App-Verhalten",
       language: "Sprache",
+      patternView: "Pattern-Ansicht",
       autoRefresh: "Auto-Refresh",
       refreshInterval: "Refresh-Intervall",
       languageDe: "Deutsch",
       languageEn: "Englisch",
+      patternViewComfortable: "Komfort",
+      patternViewCompact: "Kompakt",
       autoRefreshOn: "Ein",
       autoRefreshOff: "Aus",
       secondsSuffix: "Sekunden",
       languageHint: "Schaltet die Oberfläche und die eingebundene Anleitung zwischen Deutsch und Englisch um.",
+      patternViewHint: "Schaltet die Pattern-Sektion zwischen Kartenansicht und kompakter Tabellenansicht um.",
       autoRefreshHint: "Aktualisiert die Live-Werte automatisch in einem festen Intervall.",
       refreshIntervalHint: "Legt fest, wie oft der automatische Refresh ausgeführt wird.",
       sectionHelp:
-        "App-Optionen. Hier stellst du die Sprache der Oberfläche und der eingebundenen Anleitung um, aktivierst den automatischen Refresh der Live-Daten und bestimmst das Zeitintervall dafür.",
+        "App-Optionen. Hier stellst du Sprache, Pattern-Ansicht und den automatischen Refresh der Live-Daten ein.",
     },
     patterns: {
       title: "Patterns",
@@ -1029,6 +1054,12 @@ const translations = {
       invertAllHint: "Markiert alle Patterns als invertiert. Die Änderung wird erst mit 'Auswahl anwenden' auf die Hardware übertragen.",
       readPatternListHint: "Liest den aktuellen Pattern-Status erneut vom Controller.",
       applySelectionHint: "Überträgt die aktuelle Pattern-Auswahl auf die Hardware.",
+      compactId: "ID",
+      compactName: "Name",
+      compactState: "Status",
+      compactEnabled: "Zyklus",
+      compactInverted: "Invertiert",
+      compactActions: "Aktion",
       sectionHelp:
         "Pattern-Verwaltung. Jede Zeile zeigt ein Firmware-Pattern mit ID, Namen, Aktiv-Status, Button-Zyklus-Auswahl und optional invertierter Laufrichtung. Du kannst einzelne Patterns in den Zyklus aufnehmen oder entfernen, die Richtung umkehren, ein Pattern sofort live aktivieren, alle aktivieren, die aktuelle Liste neu lesen oder die Auswahl gesammelt anwenden.",
     },
@@ -1156,18 +1187,22 @@ const translations = {
       title: "Options",
       subtitle: "App behavior",
       language: "Language",
+      patternView: "Pattern View",
       autoRefresh: "Auto Refresh",
       refreshInterval: "Refresh Interval",
       languageDe: "German",
       languageEn: "English",
+      patternViewComfortable: "Comfortable",
+      patternViewCompact: "Compact",
       autoRefreshOn: "On",
       autoRefreshOff: "Off",
       secondsSuffix: "seconds",
       languageHint: "Switches the UI and embedded manual between German and English.",
+      patternViewHint: "Switches the pattern section between card view and compact table view.",
       autoRefreshHint: "Refreshes live values automatically on a fixed interval.",
       refreshIntervalHint: "Defines how often automatic refresh should run.",
       sectionHelp:
-        "Application options. This section switches the UI language and embedded manual language, enables automatic live refresh, and defines the refresh interval.",
+        "Application options. This section controls language, pattern view mode, and automatic live refresh.",
     },
     patterns: {
       title: "Patterns",
@@ -1190,6 +1225,12 @@ const translations = {
       invertAllHint: "Marks all patterns as inverted. The change is only sent to the hardware after 'Apply Selection'.",
       readPatternListHint: "Reads the current pattern state again from the controller.",
       applySelectionHint: "Transfers the current pattern selection to the hardware.",
+      compactId: "ID",
+      compactName: "Name",
+      compactState: "State",
+      compactEnabled: "Cycle",
+      compactInverted: "Inverted",
+      compactActions: "Action",
       sectionHelp:
         "Pattern management. Each row shows one firmware pattern with its ID, name, active state, button-cycle inclusion, and optional inverted direction. You can include or exclude patterns from the hardware button cycle, reverse their direction, make one pattern live immediately, enable all, reread the list, or apply the current selection in one step.",
     },

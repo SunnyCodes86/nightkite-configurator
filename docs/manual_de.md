@@ -14,6 +14,7 @@ Die App bietet unter anderem:
 - Verbindung mit dem Controller über einen auswählbaren seriellen Port
 - Live-Anzeige und Änderung zentraler Konfigurationswerte
 - Aktivieren, Deaktivieren und direktes Umschalten von Patterns
+- umschaltbare Pattern-Ansicht in `Kompakt` oder `Komfort`
 - Grafisch aufbereitete Diagnosewerte für Akku, Sensor, Timing und Offsets
 - Kalibrierung, Neustart und direkte CLI-Eingabe über ein integriertes Terminal
 - Eingebundene Dokumentation in Deutsch oder Englisch
@@ -83,8 +84,10 @@ Funktionen:
 - Umschalten der Sprache zwischen Deutsch und Englisch
 - Aktivieren oder Deaktivieren des automatischen Refreshs
 - Einstellen des Refresh-Intervalls in Sekunden
+- Umschalten der Pattern-Ansicht zwischen `Kompakt` und `Komfort`
 
 Die Sprachwahl beeinflusst sowohl die Oberfläche als auch die eingebundene Anleitung in der App.
+Die gewählte Pattern-Ansicht wird lokal in der App gespeichert. Standardmäßig startet die App in der `Kompakt`-Ansicht.
 
 ## Patterns
 
@@ -99,10 +102,13 @@ Je Pattern-Zeile siehst du:
 Aktionen:
 
 - Pattern im Button-Zyklus ein- oder ausschalten
+- Pattern-Ansicht zwischen einer platzsparenden Tabellenform und größeren Komfort-Karten umschalten
 - `Aktivieren`: Pattern sofort live auf der Hardware setzen
 - `Alle aktivieren`
 - `Pattern-Liste lesen`
 - `Auswahl anwenden`
+
+In der `Kompakt`-Ansicht sind die Checkboxen bewusst etwas größer dargestellt, damit die schnelle Bedienung mit vielen Pattern einfacher bleibt.
 
 ## Diagnose
 

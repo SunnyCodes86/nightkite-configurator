@@ -16,6 +16,7 @@ Der NightKite Configurator ist eine Desktop-App für die laufende Konfiguration,
 - direkte Nutzung der bestehenden NightKite-CLI
 - Live-Auswertung von spontanen Firmware-Meldungen wie Pattern-Wechseln
 - eingebundene Dokumentation in Deutsch und Englisch
+- umschaltbare Pattern-Ansicht in `Kompakt` oder `Komfort`
 - ausgelegt für die aktuelle NightKite-Multi-Firmware mit 22 Pattern, Pattern-Richtungen und Autoplay
 
 ### Screenshots
@@ -48,6 +49,7 @@ Langer Überblick der laufenden Dev-Version:
 **Pattern-Verwaltung**
 
 - alle Pattern mit Status anzeigen
+- zwischen `Kompakt`- und `Komfort`-Ansicht umschalten
 - aktive Pattern für das Button-Cycling ein- und ausschalten
 - Laufrichtung pro Pattern invertieren oder normalisieren
 - Pattern direkt aus der App aktivieren
@@ -125,6 +127,8 @@ Die App unterstützt aktuell unter anderem:
 - Änderungen im Bereich **Konfiguration** werden gesammelt und mit `Änderungen anwenden` in die laufende Firmware geschrieben.
 - Die **Helligkeit** wird bewusst live gesetzt.
 - Änderungen im Bereich **Patterns** werden separat gesammelt und mit `Auswahl anwenden` übertragen.
+- Die Pattern-Ansicht wird in **Optionen** zwischen `Kompakt` und `Komfort` umgeschaltet.
+- Standardmäßig startet die App in der **Kompaktansicht**, sofern lokal keine andere Ansicht gespeichert ist.
 - Spontane Firmware-Meldungen wie `INFO pattern_changed ...` und `INFO autoplay=...` werden live ausgewertet.
 - Reboot-pflichtige Änderungen werden in der App markiert.
 
@@ -184,6 +188,7 @@ The NightKite Configurator is a desktop app for live configuration, diagnostics,
 - direct use of the existing NightKite CLI
 - live processing of spontaneous firmware messages such as pattern changes
 - embedded German and English manuals
+- switchable pattern view in `Compact` or `Comfort`
 - designed for the current NightKite Multi firmware with 22 patterns, per-pattern direction control, and autoplay
 
 ### Screenshots
@@ -216,6 +221,7 @@ Full long screenshot of the running dev version:
 **Pattern Management**
 
 - show all patterns with status
+- switch between `Compact` and `Comfort` view
 - enable or disable patterns for button-based cycling
 - invert or normalize animation direction per pattern
 - activate a pattern directly from the app
@@ -293,6 +299,8 @@ The app currently supports, among other things:
 - Changes in **Configuration** are staged and written to the running firmware with `Apply Changes`.
 - **Brightness** is intentionally applied live.
 - Changes in **Patterns** are staged separately and sent with `Apply Selection`.
+- The pattern view can be switched in **Options** between `Compact` and `Comfort`.
+- By default the app starts in **Compact** view unless another choice is already stored locally.
 - Spontaneous firmware messages such as `INFO pattern_changed ...` and `INFO autoplay=...` are processed live.
 - Reboot-required changes are highlighted in the UI.
 

@@ -378,6 +378,61 @@ select {
   grid-template-columns: 1fr;
 }
 
+.pattern-table-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(123, 176, 255, 0.16);
+  background: linear-gradient(180deg, rgba(14, 24, 45, 0.92), rgba(10, 18, 32, 0.96));
+}
+
+.pattern-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+.pattern-table th,
+.pattern-table td {
+  padding: 0.6rem 0.7rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(123, 176, 255, 0.12);
+  vertical-align: middle;
+}
+
+.pattern-table th {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  background: rgba(9, 18, 34, 0.95);
+}
+
+.pattern-table tbody tr.is-active {
+  background: rgba(67, 216, 255, 0.08);
+}
+
+.pattern-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.pattern-table-id {
+  white-space: nowrap;
+  color: #d7ecff;
+  font-weight: 600;
+}
+
+.pattern-table-name {
+  min-width: 220px;
+  color: #eef6ff;
+  font-weight: 600;
+}
+
+.pattern-table-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
 .pattern-card {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(190px, auto) minmax(140px, auto);
@@ -484,10 +539,27 @@ select {
   overflow-wrap: anywhere;
 }
 
+.pattern-toggle-compact {
+  justify-content: center;
+  padding: 0.2rem;
+  background: transparent;
+}
+
+.pattern-toggle-compact input {
+  transform: scale(1.28);
+  transform-origin: center;
+}
+
 .pattern-activate {
   width: 100%;
   min-width: 0;
   white-space: nowrap;
+}
+
+.pattern-activate-compact {
+  width: auto;
+  min-width: 92px;
+  padding: 0.45rem 0.7rem;
 }
 
 .diagnostic-grid {
@@ -798,6 +870,10 @@ select {
   .pattern-card {
     grid-template-columns: 1fr;
     align-items: stretch;
+  }
+
+  .pattern-table {
+    min-width: 640px;
   }
 
   .offset-grid {

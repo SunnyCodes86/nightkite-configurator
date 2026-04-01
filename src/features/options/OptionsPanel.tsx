@@ -2,24 +2,30 @@ interface OptionsPanelProps {
   connected: boolean;
   busy: boolean;
   language: "de" | "en";
+  patternViewMode: "comfortable" | "compact";
   autoRefreshEnabled: boolean;
   autoRefreshSeconds: number;
   helpTooltip: string;
   onLanguageChange: (language: "de" | "en") => void;
+  onPatternViewModeChange: (mode: "comfortable" | "compact") => void;
   onAutoRefreshEnabledChange: (enabled: boolean) => void;
   onAutoRefreshSecondsChange: (seconds: number) => void;
   labels: {
     title: string;
     subtitle: string;
     language: string;
+    patternView: string;
     autoRefresh: string;
     refreshInterval: string;
     languageDe: string;
     languageEn: string;
+    patternViewComfortable: string;
+    patternViewCompact: string;
     autoRefreshOn: string;
     autoRefreshOff: string;
     secondsSuffix: string;
     languageHint: string;
+    patternViewHint: string;
     autoRefreshHint: string;
     refreshIntervalHint: string;
   };
@@ -30,10 +36,12 @@ export function OptionsPanel(props: OptionsPanelProps) {
     connected,
     busy,
     language,
+    patternViewMode,
     autoRefreshEnabled,
     autoRefreshSeconds,
     helpTooltip,
     onLanguageChange,
+    onPatternViewModeChange,
     onAutoRefreshEnabledChange,
     onAutoRefreshSecondsChange,
     labels,
@@ -62,6 +70,19 @@ export function OptionsPanel(props: OptionsPanelProps) {
           >
             <option value="de">{labels.languageDe}</option>
             <option value="en">{labels.languageEn}</option>
+          </select>
+        </label>
+
+        <label className="field">
+          <span>{labels.patternView}</span>
+          <select
+            value={patternViewMode}
+            onChange={(event) => onPatternViewModeChange(event.target.value as "comfortable" | "compact")}
+            disabled={busy}
+            title={labels.patternViewHint}
+          >
+            <option value="comfortable">{labels.patternViewComfortable}</option>
+            <option value="compact">{labels.patternViewCompact}</option>
           </select>
         </label>
 

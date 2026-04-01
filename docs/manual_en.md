@@ -14,6 +14,7 @@ The app provides:
 - connection to the controller through a selectable serial port
 - live display and editing of core configuration values
 - enabling, disabling, and directly activating patterns
+- a switchable pattern view in `Compact` or `Comfort`
 - visually prepared diagnostics for battery, sensor, timing, and offsets
 - calibration, reboot, and direct CLI input through an integrated terminal
 - embedded documentation in German or English
@@ -83,8 +84,10 @@ Functions:
 - switch the app language between German and English
 - enable or disable automatic refresh
 - set the refresh interval in seconds
+- switch the pattern view between `Compact` and `Comfort`
 
 The selected language affects both the UI and the embedded manual inside the app.
+The selected pattern view is stored locally in the app. By default the app starts in `Compact` view.
 
 ## Patterns
 
@@ -99,10 +102,13 @@ Each pattern row shows:
 Actions:
 
 - enable or disable a pattern in the button cycle
+- switch the pattern list between a space-saving table and larger comfort cards
 - `Make Active`: switch the pattern live on the hardware immediately
 - `Enable All`
 - `Read Pattern List`
 - `Apply Selection`
+
+In `Compact` view, the checkboxes are intentionally shown a bit larger so the pattern list remains easier to operate with many entries.
 
 ## Diagnostics
 
