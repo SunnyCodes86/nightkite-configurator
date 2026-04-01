@@ -172,7 +172,6 @@ npm run build:dmg
 - Die App ist gegen das aktuelle NightKite-Multi-CLI-Protokoll gebaut.
 - Änderungen an der Firmware-CLI können Parser, Logik oder UI-Anpassungen im Configurator erfordern.
 - Der macOS-`dmg`-Build ist eingerichtet und wurde erfolgreich verifiziert.
-- Für echte App-Screenshots muss Bildschirmaufnahme auf der jeweiligen Maschine erlaubt sein.
 
 ## English
 
@@ -341,4 +340,3 @@ npm run build:dmg
 - The app is built against the current NightKite Multi CLI protocol.
 - Firmware CLI changes may require parser, logic, or UI updates in the configurator.
 - The macOS `dmg` build is configured and has been verified successfully.
-- Real app screenshots require screen capture permissions on the machine where they are taken.
