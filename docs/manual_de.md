@@ -15,6 +15,7 @@ Die App bietet unter anderem:
 - Live-Anzeige und Änderung zentraler Konfigurationswerte
 - Aktivieren, Deaktivieren und direktes Umschalten von Patterns
 - umschaltbare Pattern-Ansicht in `Kompakt` oder `Komfort`
+- lokalisierte Pattern-Namen passend zur gewählten App-Sprache
 - Grafisch aufbereitete Diagnosewerte für Akku, Sensor, Timing und Offsets
 - Kalibrierung, Neustart und direkte CLI-Eingabe über ein integriertes Terminal
 - Eingebundene Dokumentation in Deutsch oder Englisch
@@ -87,6 +88,7 @@ Funktionen:
 - Umschalten der Pattern-Ansicht zwischen `Kompakt` und `Komfort`
 
 Die Sprachwahl beeinflusst sowohl die Oberfläche als auch die eingebundene Anleitung in der App.
+Auch die Pattern-Namen werden in der Oberfläche passend zur gewählten Sprache lokalisiert angezeigt.
 Die gewählte Pattern-Ansicht wird lokal in der App gespeichert. Standardmäßig startet die App in der `Kompakt`-Ansicht.
 
 ## Patterns
@@ -98,6 +100,7 @@ Je Pattern-Zeile siehst du:
 - ID und Namen
 - ob das Pattern im Button-Zyklus aktiviert ist
 - ob es aktuell live aktiv ist
+- in der `Komfort`-Ansicht zusätzlich eine kurze Beschreibung des Patterns
 
 Aktionen:
 
@@ -109,6 +112,7 @@ Aktionen:
 - `Auswahl anwenden`
 
 In der `Kompakt`-Ansicht sind die Checkboxen bewusst etwas größer dargestellt, damit die schnelle Bedienung mit vielen Pattern einfacher bleibt.
+Die `Komfort`-Ansicht orientiert sich am gleichen Grundaufbau, bietet aber mehr Platz für Namen und Beschreibung.
 
 ## Diagnose
 

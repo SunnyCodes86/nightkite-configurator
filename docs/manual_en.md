@@ -15,6 +15,7 @@ The app provides:
 - live display and editing of core configuration values
 - enabling, disabling, and directly activating patterns
 - a switchable pattern view in `Compact` or `Comfort`
+- localized pattern names based on the selected app language
 - visually prepared diagnostics for battery, sensor, timing, and offsets
 - calibration, reboot, and direct CLI input through an integrated terminal
 - embedded documentation in German or English
@@ -87,6 +88,7 @@ Functions:
 - switch the pattern view between `Compact` and `Comfort`
 
 The selected language affects both the UI and the embedded manual inside the app.
+Pattern names in the UI are also localized to match the selected language.
 The selected pattern view is stored locally in the app. By default the app starts in `Compact` view.
 
 ## Patterns
@@ -98,6 +100,7 @@ Each pattern row shows:
 - ID and name
 - whether the pattern is enabled in the hardware button cycle
 - whether it is currently live
+- in `Comfort` view, an additional short description of the pattern
 
 Actions:
 
@@ -109,6 +112,7 @@ Actions:
 - `Apply Selection`
 
 In `Compact` view, the checkboxes are intentionally shown a bit larger so the pattern list remains easier to operate with many entries.
+`Comfort` view follows the same basic structure, but adds more room for the name and description.
 
 ## Diagnostics
 
