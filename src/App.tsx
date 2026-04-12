@@ -28,6 +28,112 @@ const INITIAL_CONNECTION: ConnectionInfo = {
 };
 
 const PATTERN_VIEW_MODE_KEY = "nightkite.patternViewMode";
+const LOCALIZED_PATTERN_DESCRIPTIONS: Record<
+  AppLanguage,
+  Record<number, string>
+> = {
+  de: {
+    1: "Klassischer Regenbogenverlauf über beide Strips.",
+    2: "Beide Strips in einer festen Vollfarbe.",
+    3: "Die Helligkeit folgt direkt der Bewegung.",
+    4: "Ein einzelner Lichtläufer mit fixer Richtung.",
+    5: "Reaktiver Läufer, der auf Bewegung anspringt.",
+    6: "Zwei parallele Läufer mit getrennter Farbe.",
+    7: "Pulsierender Herzschlag-Look über beide Strips.",
+    8: "Ein Lichtpunkt läuft wie beim Ping Pong hin und her.",
+    9: "Mehrere Kometen ziehen gleichzeitig über den Strip.",
+    10: "Weiche Atembewegung mit sturmartigem Farbspiel.",
+    11: "Wellenimpuls, der durch ruckartige Bewegung getriggert wird.",
+    12: "Rotierender Farbspinner auf Basis des Yaw-Winkels.",
+    13: "Yaw-Spinner mit ringartiger Kreisbewegung.",
+    14: "Doppelläufer mit invertierter Bewegungsrichtung.",
+    15: "Sanft fließende Farbpaletten mit Beat und Bewegung.",
+    16: "Ozeanisch fließendes Wellenpattern mit Yaw-Farbsteuerung.",
+    17: "Funkelnde Lichter, die auf Bewegung reagieren.",
+    18: "Feuerähnlicher Strahl mit reaktiver Flammendynamik.",
+    19: "Weicher Farbnebel aus langsam driftendem Noise.",
+    20: "Schillernde Pride-Wellen mit Yaw-abhängiger Farbe.",
+    21: "Konfetti-Bursts bei Bewegungsspitzen und kleinen Ruckern.",
+    22: "Von der Mitte ausgehende Ripple-Welle über beide Strips.",
+  },
+  en: {
+    1: "Classic rainbow gradient across both strips.",
+    2: "Both strips shown in one solid color.",
+    3: "Brightness responds directly to motion.",
+    4: "Single runner with a fixed travel direction.",
+    5: "Reactive runner that wakes up with motion.",
+    6: "Two parallel runners with separate colors.",
+    7: "Heartbeat-style pulse across both strips.",
+    8: "A light point bounces back and forth like ping pong.",
+    9: "Multiple comets travel across the strip at once.",
+    10: "Soft breathing motion with storm-like color flow.",
+    11: "Wave pulse triggered by sudden motion changes.",
+    12: "Rotating color spinner driven by yaw angle.",
+    13: "Yaw spinner with a circular ring-like motion.",
+    14: "Dual runner with inverted motion direction.",
+    15: "Smooth flowing color palettes with beat and motion.",
+    16: "Ocean-like wave pattern with yaw-controlled color.",
+    17: "Twinkling lights reacting to movement.",
+    18: "Fire-like jet with reactive flame dynamics.",
+    19: "Soft color mist built from slowly drifting noise.",
+    20: "Shimmering pride waves with yaw-driven color.",
+    21: "Confetti bursts on motion spikes and little jerks.",
+    22: "Center-out ripple wave expanding across both strips.",
+  },
+};
+const LOCALIZED_PATTERN_NAMES: Record<
+  AppLanguage,
+  Record<number, string>
+> = {
+  de: {
+    1: "Regenbogen",
+    2: "Vollfarbe",
+    3: "Bewegungshelligkeit",
+    4: "Läufer fix",
+    5: "Läufer reaktiv",
+    6: "Doppelläufer",
+    7: "Herzschlag",
+    8: "Ping Pong",
+    9: "Kometenschwarm",
+    10: "Atemsturm",
+    11: "Ruckwelle",
+    12: "Yaw-Spinner",
+    13: "Yaw-Spinner Kreis",
+    14: "Doppelläufer invertiert",
+    15: "Palettenbeat",
+    16: "Pacifica Kite",
+    17: "Funkelbewegung",
+    18: "Feuerstrahl",
+    19: "Rauschring",
+    20: "Pride Yaw",
+    21: "Konfetti-Ruck",
+    22: "Mittenwelle",
+  },
+  en: {
+    1: "Rainbow",
+    2: "Full Color",
+    3: "Motion Brightness",
+    4: "Runner Fixed",
+    5: "Runner Reactive",
+    6: "Runner Dual",
+    7: "Heartbeat",
+    8: "Ping Pong",
+    9: "Comet Swarm",
+    10: "Breath Storm",
+    11: "Jerk Wave",
+    12: "Yaw Spinner",
+    13: "Yaw Spinner Circle",
+    14: "Runner Dual Inverted",
+    15: "Palette Beat Motion",
+    16: "Pacifica Kite",
+    17: "Twinkle Motion",
+    18: "Fire Jet",
+    19: "Noise Ring",
+    20: "Pride Yaw",
+    21: "Confetti Jerk",
+    22: "Center Ripple",
+  },
+};
 
 function readPatternViewMode(): "comfortable" | "compact" {
   if (typeof window === "undefined") {
@@ -52,6 +158,14 @@ function formatLogLine(message: string) {
 
 function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : String(error);
+}
+
+function getLocalizedPatternName(patternId: number, fallbackName: string, language: AppLanguage) {
+  return LOCALIZED_PATTERN_NAMES[language][patternId] ?? fallbackName;
+}
+
+function getLocalizedPatternDescription(patternId: number, language: AppLanguage) {
+  return LOCALIZED_PATTERN_DESCRIPTIONS[language][patternId] ?? "";
 }
 
 function isLikelyConnectionLoss(message: string) {
@@ -783,6 +897,15 @@ export default function App() {
   }
 
   const calibrationLogLines = useMemo(() => logLines.slice(-14), [logLines]);
+  const localizedPatterns = useMemo(
+    () =>
+      patterns.map((pattern) => ({
+        ...pattern,
+        name: getLocalizedPatternName(pattern.id, pattern.name, language),
+        description: getLocalizedPatternDescription(pattern.id, language),
+      })),
+    [language, patterns],
+  );
 
   return (
     <main className="app-shell">
@@ -859,7 +982,7 @@ export default function App() {
           labels={text.options}
         />
         <PatternsPanel
-          patterns={patterns.map((pattern) => ({
+          patterns={localizedPatterns.map((pattern) => ({
             ...pattern,
             active: pattern.id === activePatternId,
           }))}

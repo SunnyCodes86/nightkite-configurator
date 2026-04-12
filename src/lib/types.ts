@@ -17,6 +17,7 @@ export interface ConfigSnapshot {
 export interface PatternState {
   id: number;
   name: string;
+  description?: string;
   enabled: boolean;
   active: boolean;
   inverted: boolean;

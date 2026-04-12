@@ -130,9 +130,9 @@ export function PatternsPanel(props: PatternsPanelProps) {
               key={pattern.id}
               className={`pattern-card${pattern.enabled ? " enabled" : ""}${pattern.active ? " active" : ""}`}
             >
-              <div className="pattern-main">
-                <div className="pattern-card-header">
-                  <span className="pattern-id">#{pattern.id}</span>
+              <div className="pattern-card-summary">
+                <div className="pattern-card-id">#{pattern.id}</div>
+                <div className="pattern-card-status">
                   <div className="pattern-badges">
                     <span className={`pattern-badge ${pattern.enabled ? "is-enabled" : "is-disabled"}`}>
                       {pattern.enabled ? labels.enabled : labels.disabled}
@@ -141,37 +141,44 @@ export function PatternsPanel(props: PatternsPanelProps) {
                     {pattern.inverted ? <span className="pattern-badge is-active">{labels.inverted}</span> : null}
                   </div>
                 </div>
-                <div className="pattern-name">{pattern.name}</div>
               </div>
-              <label className="pattern-toggle">
-                <input
-                  type="checkbox"
-                  checked={pattern.enabled}
-                  onChange={() => onToggleEnabled(pattern.id)}
+
+              <div className="pattern-main">
+                <div className="pattern-name">{pattern.name}</div>
+                {pattern.description ? <div className="pattern-description">{pattern.description}</div> : null}
+              </div>
+
+              <div className="pattern-controls">
+                <label className="pattern-toggle pattern-toggle-card">
+                  <input
+                    type="checkbox"
+                    checked={pattern.enabled}
+                    onChange={() => onToggleEnabled(pattern.id)}
+                    disabled={!connected || busy}
+                    title={labels.includeInCycleHint}
+                  />
+                  <span>{labels.includeInCycle}</span>
+                </label>
+                <label className="pattern-toggle pattern-toggle-card">
+                  <input
+                    type="checkbox"
+                    checked={pattern.inverted}
+                    onChange={() => onToggleInverted(pattern.id)}
+                    disabled={!connected || busy}
+                    title={labels.invertDirectionHint}
+                  />
+                  <span>{labels.invertDirection}</span>
+                </label>
+                <button
+                  type="button"
+                  className="pattern-activate"
+                  onClick={() => onSetActive(pattern.id)}
                   disabled={!connected || busy}
-                  title={labels.includeInCycleHint}
-                />
-                <span>{labels.includeInCycle}</span>
-              </label>
-              <label className="pattern-toggle">
-                <input
-                  type="checkbox"
-                  checked={pattern.inverted}
-                  onChange={() => onToggleInverted(pattern.id)}
-                  disabled={!connected || busy}
-                  title={labels.invertDirectionHint}
-                />
-                <span>{labels.invertDirection}</span>
-              </label>
-              <button
-                type="button"
-                className="pattern-activate"
-                onClick={() => onSetActive(pattern.id)}
-                disabled={!connected || busy}
-                title={labels.makeActiveHint}
-              >
-                {labels.makeActive}
-              </button>
+                  title={labels.makeActiveHint}
+                >
+                  {labels.makeActive}
+                </button>
+              </div>
             </div>
           ))}
         </div>

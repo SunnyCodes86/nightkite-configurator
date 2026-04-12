@@ -435,14 +435,14 @@ select {
 
 .pattern-card {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(190px, auto) minmax(140px, auto);
-  gap: 0.75rem;
+  grid-template-columns: 1fr;
+  gap: 0.7rem;
   border: 1px solid rgba(123, 176, 255, 0.16);
   background: linear-gradient(180deg, rgba(14, 24, 45, 0.92), rgba(10, 18, 32, 0.96));
   border-radius: 14px;
   padding: 0.7rem 0.85rem;
   min-width: 0;
-  align-items: center;
+  align-items: stretch;
 }
 
 .pattern-card.enabled {
@@ -456,19 +456,6 @@ select {
   box-shadow: 0 0 0 1px rgba(67, 216, 255, 0.08), 0 0 24px rgba(67, 216, 255, 0.06);
 }
 
-.pattern-card-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.pattern-main {
-  min-width: 0;
-  display: grid;
-  gap: 0.35rem;
-}
-
 .pattern-id {
   display: inline-flex;
   border-radius: 999px;
@@ -479,10 +466,30 @@ select {
   font-weight: 600;
 }
 
+.pattern-card-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.pattern-main {
+  min-width: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.pattern-card-id {
+  white-space: nowrap;
+  color: #d7ecff;
+  font-weight: 600;
+}
+
 .pattern-badges {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 0.4rem;
 }
 
@@ -517,9 +524,28 @@ select {
   line-height: 1.2;
 }
 
+.pattern-description {
+  min-width: 0;
+  color: #a9bfd6;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.pattern-card-status {
+  min-width: 0;
+}
+
+.pattern-controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  min-width: 0;
+}
+
 .pattern-toggle {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: start;
   justify-content: flex-start;
   gap: 0.6rem;
   min-width: 0;
@@ -528,15 +554,23 @@ select {
   background: rgba(12, 23, 42, 0.9);
 }
 
+.pattern-toggle-card {
+  min-height: 100%;
+  width: 100%;
+}
+
 .pattern-toggle input {
-  width: auto;
-  flex: 0 0 auto;
+  width: 18px;
+  min-width: 18px;
   margin-top: 0.15rem;
 }
 
 .pattern-toggle span {
   min-width: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+  white-space: normal;
 }
 
 .pattern-toggle-compact {
@@ -554,6 +588,7 @@ select {
   width: 100%;
   min-width: 0;
   white-space: nowrap;
+  align-self: stretch;
 }
 
 .pattern-activate-compact {
@@ -870,6 +905,10 @@ select {
   .pattern-card {
     grid-template-columns: 1fr;
     align-items: stretch;
+  }
+
+  .pattern-controls {
+    grid-template-columns: 1fr;
   }
 
   .pattern-table {
