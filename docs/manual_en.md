@@ -123,10 +123,10 @@ Sections:
 - `Battery`: voltage, raw value, and charge level
 - `USB Power` and `Serial Session`
 - `Sensor State`: MPU, DMP, device state, and active sensor values
-- `Timing`: loop and work metrics reported by the firmware
+- `Timing`: loop and work metrics reported by the firmware, including timing-stat reset
 - `Offsets`: the currently active sensor offsets
 
-Each section has its own refresh button so you can reload only that part.
+Each section has its own refresh button so you can reload only that part. In the Timing section, `Reset` resets the firmware timing statistics and then reads fresh values.
 
 ## Calibration and CLI
 
@@ -146,7 +146,7 @@ The terminal:
 
 - shows replies with timestamps
 - auto-scrolls when new lines arrive
-- is suitable for direct commands like `help`, `show`, `get pattern`, `set brightness 127`
+- is suitable for direct commands like `help`, `show`, `get pattern`, `set brightness 127`, `timing reset`
 
 ## Embedded Manual
 

@@ -11,6 +11,7 @@ interface DiagnosticsPanelProps {
     battery: string;
     raw: string;
     refresh: string;
+    reset: string;
     usbPower: string;
     serialSession: string;
     online: string;
@@ -33,16 +34,18 @@ interface DiagnosticsPanelProps {
     refreshBatteryHint: string;
     refreshSensorHint: string;
     refreshTimingHint: string;
+    resetTimingHint: string;
     refreshOffsetsHint: string;
   };
   onBattery: () => void;
   onSensor: () => void;
   onTiming: () => void;
+  onTimingReset: () => void;
   onOffsets: () => void;
 }
 
 export function DiagnosticsPanel(props: DiagnosticsPanelProps) {
-  const { diagnostics, connected, busy, helpTooltip, labels, onBattery, onSensor, onTiming, onOffsets } = props;
+  const { diagnostics, connected, busy, helpTooltip, labels, onBattery, onSensor, onTiming, onTimingReset, onOffsets } = props;
   const batteryVoltageValue = Number.parseFloat(diagnostics.batteryVoltage);
   const batteryPercent = Number.isFinite(batteryVoltageValue)
     ? Math.max(0, Math.min(100, ((batteryVoltageValue - 3.2) / (4.2 - 3.2)) * 100))
@@ -170,9 +173,14 @@ export function DiagnosticsPanel(props: DiagnosticsPanelProps) {
           <div className="diagnostic-card">
             <dt className="diagnostic-card-top">
               <span>{labels.timing}</span>
-              <button type="button" className="button-compact" onClick={onTiming} disabled={!connected || busy} title={labels.refreshTimingHint}>
-                {labels.refresh}
-              </button>
+              <div className="diagnostic-card-actions">
+                <button type="button" className="button-compact" onClick={onTimingReset} disabled={!connected || busy} title={labels.resetTimingHint}>
+                  {labels.reset}
+                </button>
+                <button type="button" className="button-compact" onClick={onTiming} disabled={!connected || busy} title={labels.refreshTimingHint}>
+                  {labels.refresh}
+                </button>
+              </div>
             </dt>
             <dd>
               <div className="metric-list">

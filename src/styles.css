@@ -718,6 +718,13 @@ select {
   line-height: 1.45;
 }
 
+.diagnostic-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
 .metric-chip-grid {
   display: flex;
   flex-wrap: wrap;

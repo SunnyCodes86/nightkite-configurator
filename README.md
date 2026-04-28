@@ -64,7 +64,7 @@ Langer Überblick der laufenden Dev-Version:
 
 **Diagnose**
 
-- `battery`, `sensor`, `timing` und `offsets` lesen
+- `battery`, `sensor`, `timing`, `timing reset` und `offsets` lesen
 - Live-Zusammenfassungen für Sensor-, Timing- und Offset-Daten
 - Konfigurations- und Aktivwerte vergleichen, um reboot-pflichtige Änderungen zu erkennen
 
@@ -92,6 +92,7 @@ Die App unterstützt aktuell unter anderem:
 - `battery`
 - `sensor`
 - `timing`
+- `timing reset`
 - `offsets`
 - `get pattern`
 - `get brightness`
@@ -241,7 +242,7 @@ Full long screenshot of the running dev version:
 
 **Diagnostics**
 
-- read `battery`, `sensor`, `timing`, and `offsets`
+- read `battery`, `sensor`, `timing`, `timing reset`, and `offsets`
 - show live summaries for sensor, timing, and offset data
 - compare configured and active sensor settings to detect reboot-required changes
 
@@ -269,6 +270,7 @@ The app currently supports, among other things:
 - `battery`
 - `sensor`
 - `timing`
+- `timing reset`
 - `offsets`
 - `get pattern`
 - `get brightness`

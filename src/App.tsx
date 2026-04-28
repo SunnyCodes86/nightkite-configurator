@@ -502,6 +502,11 @@ export default function App() {
     setDiagnostics((current) => timingDiagnosticsFromCliLine(line, current));
   }
 
+  async function resetTiming() {
+    await clientRef.current.runSimpleCommand("timing reset");
+    await readTiming();
+  }
+
   async function readOffsets() {
     const line = await clientRef.current.runSimpleCommand("offsets");
     setDiagnostics((current) => offsetsDiagnosticsFromCliLine(line, current));
@@ -844,6 +849,10 @@ export default function App() {
         await readTiming();
         return;
       }
+      if (command === "timing reset") {
+        await resetTiming();
+        return;
+      }
       if (command === "offsets") {
         await readOffsets();
         return;
@@ -1028,6 +1037,11 @@ export default function App() {
               await readTiming();
             });
           }}
+          onTimingReset={() => {
+            void withBusy(async () => {
+              await resetTiming();
+            });
+          }}
           onOffsets={() => {
             void withBusy(async () => {
               await readOffsets();
@@ -1192,6 +1206,7 @@ const translations = {
       battery: "Akku",
       raw: "raw",
       refresh: "Refresh",
+      reset: "Reset",
       usbPower: "USB Power",
       serialSession: "Serielle Sitzung",
       online: "Online",
@@ -1214,6 +1229,7 @@ const translations = {
       refreshBatteryHint: "Liest Batteriewert und USB-Status erneut von der Hardware.",
       refreshSensorHint: "Liest den Sensorstatus und die aktiven IMU-Einstellungen erneut ein.",
       refreshTimingHint: "Liest die aktuellen Laufzeit- und Frame-Timing-Werte erneut ein.",
+      resetTimingHint: "Setzt die Timing-Statistik in der Firmware zurück und liest danach neue Werte ein.",
       refreshOffsetsHint: "Liest die aktuell gespeicherten Sensor-Offsets erneut vom Controller.",
       sectionHelp:
         "Diagnoseübersicht der Hardware. Akku zeigt Spannung und Rohwert, USB Power und serielle Sitzung den aktuellen Verbindungsstatus. Sensor State zeigt MPU-, DMP- und Gerätestatus samt aktiven IMU-Werten. Timing listet Loop- und Arbeitszeiten, Offsets zeigt die aktuellen Kalibrierwerte. Die Refresh-Buttons lesen den jeweiligen Bereich gezielt neu ein.",
@@ -1363,6 +1379,7 @@ const translations = {
       battery: "Battery",
       raw: "raw",
       refresh: "Refresh",
+      reset: "Reset",
       usbPower: "USB Power",
       serialSession: "Serial Session",
       online: "Online",
@@ -1385,6 +1402,7 @@ const translations = {
       refreshBatteryHint: "Reads battery level and USB power state from the hardware again.",
       refreshSensorHint: "Reads sensor status and active IMU settings again.",
       refreshTimingHint: "Reads current loop and frame timing metrics again.",
+      resetTimingHint: "Resets firmware timing statistics and then reads fresh values.",
       refreshOffsetsHint: "Reads the currently stored sensor offsets from the controller again.",
       sectionHelp:
         "Hardware diagnostics overview. Battery shows voltage and raw value, USB Power and Serial Session show the current connection state. Sensor State shows MPU, DMP, device state, and active IMU values. Timing lists loop and work timing metrics, and Offsets shows the current calibration values. Each Refresh button reloads only its own section.",

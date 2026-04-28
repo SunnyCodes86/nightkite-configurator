@@ -123,10 +123,10 @@ Teilbereiche:
 - `Akku`: Spannung, Rohwert und Ladezustand
 - `USB Power` und `Serielle Sitzung`
 - `Sensorstatus`: MPU-, DMP- und Gerätestatus sowie aktive Sensorwerte
-- `Timing`: Loop- und Work-Metriken der Firmware
+- `Timing`: Loop- und Work-Metriken der Firmware, inklusive Reset der Timing-Statistik
 - `Offsets`: aktuell verwendete Sensor-Offsets
 
-Jeder Bereich besitzt einen eigenen Refresh-Button, um nur diesen Teil gezielt neu zu laden.
+Jeder Bereich besitzt einen eigenen Refresh-Button, um nur diesen Teil gezielt neu zu laden. Im Timing-Bereich setzt `Reset` die Statistik in der Firmware zurück und liest danach frische Werte ein.
 
 ## Kalibrierung und CLI
 
@@ -146,7 +146,7 @@ Das Terminal:
 
 - zeigt Antworten mit Zeitstempel
 - scrollt bei neuen Einträgen automatisch nach unten
-- eignet sich für direkte Befehle wie `help`, `show`, `get pattern`, `set brightness 127`
+- eignet sich für direkte Befehle wie `help`, `show`, `get pattern`, `set brightness 127`, `timing reset`
 
 ## Eingebundene Anleitung
 

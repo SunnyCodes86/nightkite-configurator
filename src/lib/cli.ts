@@ -202,6 +202,9 @@ export function timingDiagnosticsFromCliLine(
     `max loop=${line.values.max_loop_us ?? "?"} us`,
     `last work=${line.values.last_work_us ?? "?"} us`,
     `avg work=${line.values.avg_work_us ?? "?"} us`,
+    `max work=${line.values.max_work_us ?? "?"} us`,
+    `budget=${line.values.frame_budget_us ?? "?"} us`,
+    `samples=${line.values.samples ?? "?"}`,
   ];
 
   return {
