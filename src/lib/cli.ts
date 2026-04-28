@@ -9,7 +9,7 @@ import type {
 export const FIRST_PATTERN_ID = 1;
 export const LAST_PATTERN_ID = 22;
 
-const KEY_VALUE_PATTERN = /([a-z_]+)=("[^"]*"|[^\s]+)/gi;
+const KEY_VALUE_PATTERN = /([a-z_]+)=("[^"]*"|[^\s]*)/gi;
 
 export const DEFAULT_CONFIG: ConfigSnapshot = {
   pattern: 1,
