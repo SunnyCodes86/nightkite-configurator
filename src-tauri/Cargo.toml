@@ -1,6 +1,6 @@
 [package]
 name = "nightkite-configurator"
-version = "0.1.0"
+version = "1.0.0"
 description = "Desktop configuration tool for the NightKite Multi controller"
 authors = ["administrator"]
 edition = "2021"
